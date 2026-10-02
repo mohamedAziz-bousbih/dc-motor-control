@@ -1,0 +1,5 @@
+[tool.pytest.ini_options]
+testpaths = ["tests/python"]
+pythonpath = ["."]
+addopts = "-ra"
+filterwarnings = ["error"]

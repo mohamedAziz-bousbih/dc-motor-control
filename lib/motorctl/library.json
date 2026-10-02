@@ -1,0 +1,12 @@
+{
+  "name": "motorctl",
+  "version": "1.0.0",
+  "description": "Portable C11 DC-servo controllers: PID with anti-windup, state feedback with observer, encoder extension, command parser",
+  "license": "MIT",
+  "frameworks": "*",
+  "platforms": "*",
+  "build": {
+    "includeDir": "include",
+    "srcDir": "src"
+  }
+}
