@@ -140,6 +140,34 @@ static void test_position_mode_holds_angle_at_switch(void)
     CHECK_NEAR(s.r_eff, s.target, 1e-6);
 }
 
+/* Runs VOLTAGE mode at 4 V with the motor turning at a constant count rate
+ * until the speed filter has settled, then switches to `mode` and returns
+ * the first closed-loop output. */
+static float output_after_switch_from_voltage(mc_mode_t mode)
+{
+    const mc_servo_config_t cfg = servo_config_from_params();
+    mc_servo_t s;
+    CHECK(mc_servo_init(&s, &cfg, 0) == MC_OK);
+    CHECK(mc_servo_set_mode(&s, MC_MODE_VOLTAGE) == MC_OK);
+    mc_servo_set_setpoint(&s, 4.0f);
+    int32_t counts = 0;
+    for (int k = 0; k < 200; ++k) {
+        counts += 5;
+        CHECK(mc_servo_update(&s, counts) == 4.0f);
+    }
+    CHECK(mc_servo_set_mode(&s, mode) == MC_OK);
+    counts += 5;
+    return mc_servo_update(&s, counts);
+}
+
+static void test_switch_from_voltage_mode_is_bumpless(void)
+{
+    /* PI and state controller take over the last output (their integrators
+     * absorb it); only the regular one-sample increment may remain. */
+    CHECK_NEAR(output_after_switch_from_voltage(MC_MODE_SPEED), 4.0, 1e-3);
+    CHECK_NEAR(output_after_switch_from_voltage(MC_MODE_STATE), 4.0, 1e-3);
+}
+
 static void test_state_mode_reports_observer_speed(void)
 {
     const mc_servo_config_t cfg = servo_config_from_params();
@@ -185,6 +213,7 @@ int main(void)
     RUN_TEST(test_count_wraparound_is_a_small_step);
     RUN_TEST(test_voltage_and_off_modes);
     RUN_TEST(test_position_mode_holds_angle_at_switch);
+    RUN_TEST(test_switch_from_voltage_mode_is_bumpless);
     RUN_TEST(test_state_mode_reports_observer_speed);
     RUN_TEST(test_nonfinite_output_switches_the_servo_off);
     return mc_test_report();

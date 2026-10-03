@@ -228,7 +228,7 @@ The modelled motor draws 12 V / 2.4 ohm = 5 A at standstill, so the power stage 
 | GND | VNH5019 GND, encoder GND, supply GND | common ground |
 | - | VNH5019 VIN = 12 V supply, OUTA/OUTB = motor | power |
 
-The encoder resolution assumed throughout is 1320 counts per output revolution after x4 decoding. None of the GPIOs used is a boot-strapping pin, so the wiring cannot change the ESP32 boot mode.
+The encoder resolution assumed throughout is 1320 counts per output revolution after x4 decoding. The encoder must work from 3.3 V or have open-collector outputs pulled up to 3.3 V; many gearmotor Hall encoders need at least 3.5 V supply, and a 5 V push-pull encoder needs level shifting because the ESP32 inputs are not 5 V tolerant. None of the GPIOs used is a boot-strapping pin, so the wiring cannot change the ESP32 boot mode.
 
 ### Serial interface
 

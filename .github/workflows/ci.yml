@@ -28,6 +28,11 @@ jobs:
         variant: [release, sanitizers]
     steps:
       - uses: actions/checkout@v4
+      - name: Limit ASLR entropy for AddressSanitizer
+        # ASan's shadow memory layout breaks with the 32-bit mmap randomisation
+        # of recent Ubuntu kernels; 28 bits is the value ASan supports.
+        if: matrix.variant == 'sanitizers'
+        run: sudo sysctl -w vm.mmap_rnd_bits=28
       - name: Configure
         run: >
           cmake -S . -B build -DMOTORCTL_WERROR=ON
